@@ -6,6 +6,10 @@
 #include <android_native_app_glue.h>
 #include <jni.h>
 #include <pthread.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <time.h>
 
 Engine::Engine() {
 }
@@ -21,9 +25,47 @@ static void checkGlError(const char* op) {
 
 void Engine::init() {
     float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f,  0.5f, 0.0f
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     glGenVertexArrays(1, &mVao);
@@ -34,8 +76,10 @@ void Engine::init() {
     int vertexSize = sizeof(vertices);
     glBufferData(GL_ARRAY_BUFFER, vertexSize, vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 }
 
 Engine* Engine::getInstance() {
@@ -48,10 +92,18 @@ Engine* Engine::getInstance() {
 
 void Engine::initDisplay() {
     EGLConfig config = nullptr;
-    const EGLint attribs[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-                              EGL_BLUE_SIZE, 8,
-                              EGL_GREEN_SIZE, 8,
-                              EGL_RED_SIZE, 8,
+    const EGLint attribs[] = {EGL_RENDERABLE_TYPE,
+                              EGL_OPENGL_ES3_BIT,  // Request opengl ES2.0
+                              EGL_SURFACE_TYPE,
+                              EGL_WINDOW_BIT,
+                              EGL_BLUE_SIZE,
+                              8,
+                              EGL_GREEN_SIZE,
+                              8,
+                              EGL_RED_SIZE,
+                              8,
+                              EGL_DEPTH_SIZE,
+                              24,
                               EGL_NONE};
     mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     eglInitialize(mDisplay, nullptr, nullptr);
@@ -95,7 +147,7 @@ void Engine::run(android_app* app) {
     mApp->userData = this;
     mApp->onAppCmd = handleCmdProxy;
 
-    glViewport(0, 0, 1080, 2340);
+    glViewport(0, 0, mWidth, mHeight);
     while (!mApp->destroyRequested) {
         android_poll_source *pollSource = nullptr;
         auto result = ALooper_pollOnce(0, nullptr, nullptr, (void **) &pollSource);
@@ -108,18 +160,36 @@ void Engine::run(android_app* app) {
             pollSource->process(mApp, pollSource);
         }
 
-        if (!mDisplay) {
-            LOGE("display is not initialised!");
-            return;
-        }
+        glClearColor(0.0f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glClearColor(0.9f, 0.2f, 0.9f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glEnable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(true);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         //draw stuff
-        //glBindVertexArray(mVao);
         glUseProgram(mShader.id);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        auto nowNs = now.tv_sec * 1000000000ull + now.tv_nsec;
+        float deltaTime = float(nowNs - mLastFrameNs) * 0.000000001f;
+
+        time += deltaTime;
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(time * 0.00001f), glm::vec3(1.0f, 0.0f, 1.0f));
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(mHeight / mWidth), 0.1f, 100.0f);
+
+        glUniformMatrix4fv(glGetUniformLocation(mShader.id, "model"), 1, false, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(mShader.id, "view"), 1, false, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(mShader.id, "projection"), 1, false, glm::value_ptr(projection));
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         eglSwapBuffers(mDisplay, mSurface);
     }

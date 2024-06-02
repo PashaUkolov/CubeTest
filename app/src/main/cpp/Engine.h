@@ -36,4 +36,8 @@ private:
     Shader mShader;
     GLuint mVao, mVbo;
     bool mIsContextInited = false;
+    int mHeight = 2340;
+    int mWidth = 1080;
+    uint64_t mLastFrameNs;
+    float time = 0.0f;
 };
