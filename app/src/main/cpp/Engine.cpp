@@ -83,17 +83,17 @@ void Engine::init() {
 }
 
 Engine* Engine::getInstance() {
-    if (!instance) {
-        instance = new Engine();
+    if (!mInstance) {
+        mInstance = new Engine();
     }
 
-    return instance;
+    return mInstance;
 }
 
 void Engine::initDisplay() {
     EGLConfig config = nullptr;
     const EGLint attribs[] = {EGL_RENDERABLE_TYPE,
-                              EGL_OPENGL_ES3_BIT,  // Request opengl ES2.0
+                              EGL_OPENGL_ES3_BIT,  // Request opengl ES3.0
                               EGL_SURFACE_TYPE,
                               EGL_WINDOW_BIT,
                               EGL_BLUE_SIZE,
@@ -107,10 +107,10 @@ void Engine::initDisplay() {
                               EGL_NONE};
     mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     eglInitialize(mDisplay, nullptr, nullptr);
-    eglChooseConfig(mDisplay, attribs, nullptr, 0, &numConfigs);
-    std::unique_ptr<EGLConfig[]> supportedConfigs(new EGLConfig[numConfigs]);
-    eglChooseConfig(mDisplay, attribs, supportedConfigs.get(), numConfigs, &numConfigs);
-    if (numConfigs) {
+    eglChooseConfig(mDisplay, attribs, nullptr, 0, &mNumConfigs);
+    std::unique_ptr<EGLConfig[]> supportedConfigs(new EGLConfig[mNumConfigs]);
+    eglChooseConfig(mDisplay, attribs, supportedConfigs.get(), mNumConfigs, &mNumConfigs);
+    if (mNumConfigs) {
         LOGI("CONFIG IS SET!");
         config = supportedConfigs[0];
     }
@@ -121,7 +121,7 @@ void Engine::initDisplay() {
 
     const EGLint contextAttribs[] = {EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE};
 
-    eglGetConfigAttrib(mDisplay, config, EGL_NATIVE_VISUAL_ID, &format);
+    eglGetConfigAttrib(mDisplay, config, EGL_NATIVE_VISUAL_ID, &mFormat);
     mSurface = eglCreateWindowSurface(mDisplay, config, mApp->window, nullptr);
     if (mSurface == EGL_NO_SURFACE) {
         LOGE("Failed to create EGL surface, EGL error %d", eglGetError());
@@ -163,7 +163,6 @@ void Engine::run(android_app* app) {
         glClearColor(0.0f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glDepthMask(true);
@@ -172,18 +171,12 @@ void Engine::run(android_app* app) {
         //draw stuff
         glUseProgram(mShader.id);
 
-        timespec now;
-        clock_gettime(CLOCK_MONOTONIC, &now);
-        auto nowNs = now.tv_sec * 1000000000ull + now.tv_nsec;
-        float deltaTime = float(nowNs - mLastFrameNs) * 0.000000001f;
-
-        time += deltaTime;
-
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(time * 0.00001f), glm::vec3(1.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, glm::radians(-mCubeRotationY), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(-mCubeRotationX), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(mHeight / mWidth), 0.1f, 100.0f);
+        view = glm::lookAt(glm::vec3(0.0f, 0.0f, -7.0f ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.1f, 1000.0f);
 
         glUniformMatrix4fv(glGetUniformLocation(mShader.id, "model"), 1, false, glm::value_ptr(model));
         glUniformMatrix4fv(glGetUniformLocation(mShader.id, "view"), 1, false, glm::value_ptr(view));
@@ -219,6 +212,11 @@ void Engine::handleCmd(android_app *app, int32_t cmd) {
         default:
             break;
     }
+}
+
+void Engine::touchEventFromJNI(float x, float y) {
+    mCubeRotationX = (x / mWidth) * 360.0f;
+    mCubeRotationY = (y / mHeight) * 360.0f;
 }
 
 static void DetachCurrentThreadDtor(void* p) {

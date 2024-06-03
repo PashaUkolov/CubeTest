@@ -18,19 +18,20 @@ public:
     void run(android_app* app);
     void handleCmd(android_app* app, int32_t cmd);
 
+    void touchEventFromJNI(float x, float y);
+
     JNIEnv* attachCurrentThread();
     void detachCurrentThread();
 
     jstring GetExternalFilesDirJString(JNIEnv* env);
 
-    bool readFile(const std::string& path);
     bool readFile(const char* fileName, std::vector<uint8_t>* buffer);
 private:
-    inline static Engine* instance = nullptr;
+    inline static Engine* mInstance = nullptr;
     android_app* mApp;
     EGLDisplay mDisplay;
-    EGLint numConfigs;
-    EGLint format;
+    EGLint mNumConfigs;
+    EGLint mFormat;
     EGLSurface mSurface;
     EGLContext mContext;
     Shader mShader;
@@ -39,5 +40,7 @@ private:
     int mHeight = 2340;
     int mWidth = 1080;
     uint64_t mLastFrameNs;
-    float time = 0.0f;
+    float mTime = 0.0f;
+    float mCubeRotationX = 0.0f;
+    float mCubeRotationY = 0.0f;
 };

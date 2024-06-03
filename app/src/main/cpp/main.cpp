@@ -4,6 +4,5 @@
 
 void android_main(android_app* app) {
     Engine* engine = Engine::getInstance();
-    //engine->init(app);
     engine->run(app);
 }
