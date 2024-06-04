@@ -8,7 +8,6 @@
 class Mesh {
 public:
     Mesh();
-    void initCube();
     void draw(const Shader& shader);
     void update();
     void setPosition(glm::vec3 position);

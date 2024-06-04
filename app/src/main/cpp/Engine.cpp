@@ -10,9 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <time.h>
-#include "Mesh.h"
 #include "Cube.h"
-//class Cube;
 
 Engine::Engine() {
 }
@@ -32,11 +30,8 @@ Engine* Engine::getInstance() {
 }
 
 void Engine::init() {
-    Mesh* mesh = new Mesh();
     Cube* cube = new Cube();
-   //Cube cube;
-    //Cube* cube = new Cube();
-    //mGameObjects.push_back(cube);
+    mGameObjects.push_back(cube);
 }
 
 void Engine::initDisplay() {
@@ -123,8 +118,8 @@ void Engine::run(android_app* app) {
         glUseProgram(mShader.mId);
 
         for(const auto& object : mGameObjects) {
-            //object->draw();
-            //object->update();
+            object->draw(mShader);
+            object->update();
         }
         eglSwapBuffers(mDisplay, mSurface);
     }

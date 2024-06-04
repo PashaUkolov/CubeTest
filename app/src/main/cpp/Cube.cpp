@@ -1,8 +1,8 @@
 #include "Cube.h"
 #include "Engine.h"
 
-void Cube::draw() {
-    //mCubeMesh.draw(shader);
+void Cube::draw(Shader shader) {
+    mCubeMesh.draw(shader);
 }
 
 void Cube::update() {

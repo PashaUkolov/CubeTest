@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "Shader.h"
 
 class TransformComponent {
 public:
@@ -24,9 +25,11 @@ private:
     float mScale = 1.0f;
 };
 
-struct GameObject : public TransformComponent {
-    GameObject();
-    void draw();
-    void update();
-    ~GameObject();
+class GameObject : public TransformComponent {
+public:
+    GameObject() {};
+    virtual ~GameObject();
+
+    virtual void draw(Shader shader) {};
+    virtual void update() {};
 };

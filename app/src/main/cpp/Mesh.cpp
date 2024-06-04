@@ -14,9 +14,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Mesh::Mesh() {
-}
-
-void Mesh::initCube() {
     std::vector<float> vertices = {
             -.5f, -.5f, -.5f, .9f, .9f, .9f,
             -.5f, .5f, .5f, .9f, .9f, .9f,

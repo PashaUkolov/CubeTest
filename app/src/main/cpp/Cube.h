@@ -4,9 +4,9 @@
 
 class Cube : public GameObject {
 public:
-    void draw() ;
-    void update() ;
-    ~Cube();
+    void draw(Shader shader) override;
+    void update() override;
+    virtual ~Cube() {};
 private:
     Mesh mCubeMesh;
 

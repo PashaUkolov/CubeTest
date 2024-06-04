@@ -24,10 +24,5 @@ void TransformComponent::setScale(float scale) {
     mScale = scale;
 }
 
-GameObject::GameObject() {
-
-}
-
 GameObject::~GameObject() {
-
 }

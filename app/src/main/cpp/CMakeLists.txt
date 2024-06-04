@@ -9,7 +9,7 @@ add_library(native_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glu
 
 set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
 
-file(GLOB_RECURSE native-activity_SRC "*.cpp" "*.hpp")
+file(GLOB_RECURSE native-activity_SRC "*.cpp" "*.hpp" "*.h")
 add_library(native-activity SHARED ${native-activity_SRC})
 
 target_include_directories(native-activity
