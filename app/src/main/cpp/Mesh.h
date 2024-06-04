@@ -20,9 +20,9 @@ private:
     std::vector<uint32_t> mIndices;
     GLuint mVao, mVbo, mEbo;
 
-    glm::vec3 mPosition;
-    glm::vec3 mRotation;
-    glm::vec3 mScale;
+    glm::vec3 mPosition{0.0f};
+    glm::vec3 mRotation{0.0f};
+    glm::vec3 mScale{1.0f};
 
     float mCubeRotationX = 0.0f;
     float mCubeRotationY = 0.0f;

@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 #include "Shader.h"
-#include "Mesh.h"
+#include "GameObject.h"
 
 #include <android_native_app_glue.h>
 
@@ -32,6 +32,8 @@ public:
     float getToucPosX() { return mTouchPosX; }
     float getToucPosY() { return mTouchPosY; }
 
+    void addGameObject(GameObject* object);
+
     JNIEnv* attachCurrentThread();
     void detachCurrentThread();
     jstring GetExternalFilesDirJString(JNIEnv* env);
@@ -48,10 +50,10 @@ private:
     Shader mShader;
     int mHeight = 2340;
     int mWidth = 1080;
-    Mesh mCubeMesh;
     bool mIsMoveAction = false;
     bool mIsDownAction = false;
     bool mIsUpAction = false;
     float mTouchPosX = 0.0f;
     float mTouchPosY = 0.0f;
+    std::vector<GameObject*> mGameObjects;
 };

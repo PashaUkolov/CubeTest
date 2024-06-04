@@ -50,12 +50,12 @@ void Shader::compileShader(const std::string& path) {
     glCompileShader(fragmentShader);
     checkErrors(fragmentShader, "FRAGMENT");
 
-    id = glCreateProgram();
-    glAttachShader(id, vertexShader);
-    glAttachShader(id, fragmentShader);
+    mId = glCreateProgram();
+    glAttachShader(mId, vertexShader);
+    glAttachShader(mId, fragmentShader);
 
-    glLinkProgram(id);
-    checkErrors(id, "PROGRAM");
+    glLinkProgram(mId);
+    checkErrors(mId, "PROGRAM");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
