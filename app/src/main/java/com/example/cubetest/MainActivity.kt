@@ -24,11 +24,19 @@ class MainActivity : NativeActivity() {
 
         when (event.action) {
             MotionEvent.ACTION_MOVE -> {
-                handleTouchEvent(event.x, event.y)
+                handleMoveAction(event.x, event.y)
+            }
+            MotionEvent.ACTION_DOWN -> {
+                handleDownAction(event.x, event.y)
+            }
+            MotionEvent.ACTION_UP -> {
+                handleUpAction(event.x, event.y)
             }
         }
         return super.onTouchEvent(event)
     }
 
-    external fun handleTouchEvent(x: Float, y: Float);
+    external fun handleMoveAction(x: Float, y: Float);
+    external fun handleDownAction(x: Float, y: Float);
+    external fun handleUpAction(x: Float, y: Float);
 }

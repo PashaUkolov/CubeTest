@@ -17,69 +17,9 @@ Engine::Engine() {
 Engine::~Engine() {
 }
 
-static void checkGlError(const char* op) {
-    for (GLint error = glGetError(); error; error = glGetError()) {
-        LOGE("after %s() glError (0x%x)\n", op, error);
-    }
-}
-
 void Engine::init() {
-    float vertices[] = {
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-
-    glGenVertexArrays(1, &mVao);
-    glBindVertexArray(mVao);
-
-    glGenBuffers(1, &mVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, mVbo);
-    int vertexSize = sizeof(vertices);
-    glBufferData(GL_ARRAY_BUFFER, vertexSize, vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    mCubeMesh.initCube();
+    mShader = Shader("shaders/default");
 }
 
 Engine* Engine::getInstance() {
@@ -132,8 +72,6 @@ void Engine::initDisplay() {
         LOGE("failed to make context current");
         return;
     }
-
-    mIsContextInited = true;
     init();
 }
 
@@ -160,6 +98,10 @@ void Engine::run(android_app* app) {
             pollSource->process(mApp, pollSource);
         }
 
+        mIsMoveAction = false;
+        mIsUpAction = false;
+        mIsDownAction = false;
+
         glClearColor(0.0f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -171,19 +113,27 @@ void Engine::run(android_app* app) {
         //draw stuff
         glUseProgram(mShader.id);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-mCubeRotationY), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(-mCubeRotationX), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::lookAt(glm::vec3(0.0f, 0.0f, -7.0f ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(mWidth) / static_cast<float>(mHeight), 0.1f, 1000.0f);
+        mCubeMesh.draw(mShader);
 
-        glUniformMatrix4fv(glGetUniformLocation(mShader.id, "model"), 1, false, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(mShader.id, "view"), 1, false, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(mShader.id, "projection"), 1, false, glm::value_ptr(projection));
+        if(mIsDownAction) {
+            currX = mTouchPosX;
+            currY = mTouchPosY;
+            mPreviousCubeRotationX = mCubeRotationX;
+            mPreviousCubeRotationY = mCubeRotationY;
+        }
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        if(mIsMoveAction) {
+            float radius = 3.0f;
+            mCubeRotationX = mPreviousCubeRotationX + (currX - mTouchPosX) / mWidth;
+            mCubeRotationY = mPreviousCubeRotationY + (currY - mTouchPosY) / mHeight;
+            mCubeMesh.setPosition(glm::vec3(sinf(mCubeRotationY * 2*PI) * radius, 0.0f, cosf(mCubeRotationY* 2*PI) * radius));
+            mCubeMesh.setRotation(glm::vec3(0.0f, mCubeRotationY * 2*PI, 0.0f));
+        }
 
+        if(mIsUpAction) {
+            mPreviousCubeRotationX = mCubeRotationX;
+            mPreviousCubeRotationY = mCubeRotationY;
+        }
         eglSwapBuffers(mDisplay, mSurface);
     }
 }
@@ -197,7 +147,6 @@ void Engine::handleCmd(android_app *app, int32_t cmd) {
             // The window is being shown, get it ready.
             if (app->window != nullptr) {
                 initDisplay();
-                mShader = Shader("shaders/default");
             }
             break;
         case APP_CMD_TERM_WINDOW:
@@ -214,9 +163,22 @@ void Engine::handleCmd(android_app *app, int32_t cmd) {
     }
 }
 
-void Engine::touchEventFromJNI(float x, float y) {
-    mCubeRotationX = (x / mWidth) * 360.0f;
-    mCubeRotationY = (y / mHeight) * 360.0f;
+void Engine::moveActionFromJNI(float x, float y) {
+    mTouchPosX = x;
+    mTouchPosY = y;
+    mIsMoveAction = true;
+}
+
+void Engine::downActionFromJNI(float x, float y) {
+    mTouchPosX = x;
+    mTouchPosY = y;
+    mIsDownAction = true;
+}
+
+void Engine::upActionFromJNI(float x, float y) {
+    mTouchPosX = x;
+    mTouchPosY = y;
+    mIsUpAction = true;
 }
 
 static void DetachCurrentThreadDtor(void* p) {
@@ -251,7 +213,6 @@ jstring Engine::GetExternalFilesDirJString(JNIEnv* env) {
     }
 
     jstring obj_Path = nullptr;
-    // Invoking getExternalFilesDir() java API
     jclass clsEnv = env->FindClass("android/app/NativeActivity");
     jmethodID mid = env->GetMethodID(clsEnv, "getExternalFilesDir", "(Ljava/lang/String;)Ljava/io/File;");
     jobject objFile = env->CallObjectMethod(mApp->activity->clazz, mid, NULL);
