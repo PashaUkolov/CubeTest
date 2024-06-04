@@ -10,6 +10,7 @@ public:
     Mesh();
     void initCube();
     void draw(const Shader& shader);
+    void update();
     void setPosition(glm::vec3 position);
     void setRotation(glm::vec3 rotation);
 private:
@@ -22,4 +23,11 @@ private:
     glm::vec3 mPosition;
     glm::vec3 mRotation;
     glm::vec3 mScale;
+
+    float mCubeRotationX = 0.0f;
+    float mCubeRotationY = 0.0f;
+    float mPreviousCubeRotationX = 0.0f;
+    float mPreviousCubeRotationY = 0.0f;
+    float mCurrX = 0.0f;
+    float mCurrY = 0.0f;
 };

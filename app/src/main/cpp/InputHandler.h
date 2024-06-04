@@ -1,7 +1,6 @@
 #pragma once
 
 #include <jni.h>
-#include "common.h"
 #include "Engine.h"
 
 extern "C"

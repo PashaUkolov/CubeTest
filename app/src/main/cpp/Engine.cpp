@@ -17,17 +17,16 @@ Engine::Engine() {
 Engine::~Engine() {
 }
 
-void Engine::init() {
-    mCubeMesh.initCube();
-    mShader = Shader("shaders/default");
-}
-
 Engine* Engine::getInstance() {
     if (!mInstance) {
         mInstance = new Engine();
     }
 
     return mInstance;
+}
+
+void Engine::init() {
+    mCubeMesh.initCube();
 }
 
 void Engine::initDisplay() {
@@ -114,26 +113,8 @@ void Engine::run(android_app* app) {
         glUseProgram(mShader.id);
 
         mCubeMesh.draw(mShader);
+        mCubeMesh.update();
 
-        if(mIsDownAction) {
-            currX = mTouchPosX;
-            currY = mTouchPosY;
-            mPreviousCubeRotationX = mCubeRotationX;
-            mPreviousCubeRotationY = mCubeRotationY;
-        }
-
-        if(mIsMoveAction) {
-            float radius = 3.0f;
-            mCubeRotationX = mPreviousCubeRotationX + (currX - mTouchPosX) / mWidth;
-            mCubeRotationY = mPreviousCubeRotationY + (currY - mTouchPosY) / mHeight;
-            mCubeMesh.setPosition(glm::vec3(sinf(mCubeRotationY * 2*PI) * radius, 0.0f, cosf(mCubeRotationY* 2*PI) * radius));
-            mCubeMesh.setRotation(glm::vec3(0.0f, mCubeRotationY * 2*PI, 0.0f));
-        }
-
-        if(mIsUpAction) {
-            mPreviousCubeRotationX = mCubeRotationX;
-            mPreviousCubeRotationY = mCubeRotationY;
-        }
         eglSwapBuffers(mDisplay, mSurface);
     }
 }
@@ -141,22 +122,18 @@ void Engine::run(android_app* app) {
 void Engine::handleCmd(android_app *app, int32_t cmd) {
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
-
             break;
         case APP_CMD_INIT_WINDOW:
-            // The window is being shown, get it ready.
             if (app->window != nullptr) {
                 initDisplay();
+                mShader = Shader("shaders/default");
             }
             break;
         case APP_CMD_TERM_WINDOW:
-
             break;
         case APP_CMD_GAINED_FOCUS:
-
             break;
         case APP_CMD_LOST_FOCUS:
-
             break;
         default:
             break;
