@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include <vector>
 #include <glm/glm.hpp>
 #include "common.h"
@@ -9,7 +8,6 @@ class Mesh {
 public:
     Mesh();
     void draw(const Shader& shader);
-    void update();
     void setPosition(glm::vec3 position);
     void setRotation(glm::vec3 rotation);
 private:

@@ -2,12 +2,7 @@
 #include "common.h"
 #include "Engine.h"
 
-#include <cstdio>
 #include <vector>
-#include <sstream>
-#include <fstream>
-#include <iostream>
-#include <string>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -89,26 +84,4 @@ void Mesh::setPosition(glm::vec3 position) {
 
 void Mesh::setRotation(glm::vec3 rotation) {
     mRotation = rotation;
-}
-
-void Mesh::update() {
-    if(Engine::getInstance()->isDownAction()) {
-        mCurrX = Engine::getInstance()->getToucPosX();
-        mCurrY = Engine::getInstance()->getToucPosY();
-        mPreviousCubeRotationX = mCubeRotationX;
-        mPreviousCubeRotationY = mCubeRotationY;
-    }
-
-    if(Engine::getInstance()->isMoveAction()) {
-        float radius = 3.0f;
-        mCubeRotationX = mPreviousCubeRotationX + (mCurrX - Engine::getInstance()->getToucPosX()) / Engine::getInstance()->getWidth();
-        mCubeRotationY = mPreviousCubeRotationY + (mCurrY - Engine::getInstance()->getToucPosY()) / Engine::getInstance()->getHeight();
-        setPosition(glm::vec3(sinf(mCubeRotationY * 2*PI) * radius, 0.0f, cosf(mCubeRotationY* 2*PI) * radius));
-        setRotation(glm::vec3(0.0f, mCubeRotationY * 2*PI, 0.0f));
-    }
-
-    if(Engine::getInstance()->isUpAction()) {
-        mPreviousCubeRotationX = mCubeRotationX;
-        mPreviousCubeRotationY = mCubeRotationY;
-    }
 }

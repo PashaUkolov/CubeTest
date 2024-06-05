@@ -1,6 +1,4 @@
 #include "Shader.h"
-#include <sstream>
-#include <fstream>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include "Engine.h"
