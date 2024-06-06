@@ -29,11 +29,12 @@ Engine* Engine::getInstance() {
 }
 
 void Engine::init() {
-    Cube* cube = new Cube();
+    Cube *cube = new Cube();
     mGameObjects.push_back(cube);
+    mShader = Shader("shaders/default");
 }
 
-void Engine::initDisplay() {
+void Engine::initRendering() {
     EGLConfig config = nullptr;
     const EGLint attribs[] = {EGL_RENDERABLE_TYPE,
                               EGL_OPENGL_ES3_BIT,  // Request opengl ES3.0
@@ -70,17 +71,25 @@ void Engine::initDisplay() {
         LOGE("Failed to create EGL surface, EGL error %d", eglGetError());
         return;
     }
-    mContext = eglCreateContext(mDisplay, config, nullptr, contextAttribs);
+
+    if (mContext == EGL_NO_CONTEXT) {
+        LOGI("NativeEngine: no need to init context (already had one).");
+        mContext = eglCreateContext(mDisplay, config, nullptr, contextAttribs);
+    }
+
     if (eglMakeCurrent(mDisplay, mSurface, mSurface, mContext) == EGL_FALSE) {
         LOGE("failed to make context current");
         return;
     }
-    init();
 }
 
 static void handleCmdProxy(struct android_app *app, int32_t cmd) {
     Engine *engine = (Engine *) app->userData;
     engine->handleCmd(app, cmd);
+}
+
+bool Engine::isDrawing() {
+    return mIsVisible && mIsWindowInited;
 }
 
 void Engine::run(android_app* app) {
@@ -114,12 +123,20 @@ void Engine::run(android_app* app) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         //draw stuff
-        glUseProgram(mShader.mId);
+        if(isDrawing()) {
+            if (mIsFirstFrame) {
+                mIsFirstFrame = false;
+                init();
+            }
 
-        for(const auto& object : mGameObjects) {
-            object->draw(mShader);
-            object->update();
+            glUseProgram(mShader.mId);
+
+            for(const auto& object : mGameObjects) {
+                object->draw(mShader);
+                object->update();
+            }
         }
+
         eglSwapBuffers(mDisplay, mSurface);
     }
 }
@@ -130,11 +147,17 @@ void Engine::handleCmd(android_app *app, int32_t cmd) {
             break;
         case APP_CMD_INIT_WINDOW:
             if (app->window != nullptr) {
-                initDisplay();
-                mShader = Shader("shaders/default");
+                initRendering();
+                mIsWindowInited = true;
             }
             break;
         case APP_CMD_TERM_WINDOW:
+            mIsWindowInited = false;
+        case APP_CMD_START:
+            mIsVisible = true;
+            break;
+        case APP_CMD_STOP:
+            mIsVisible = false;
             break;
         case APP_CMD_GAINED_FOCUS:
             break;

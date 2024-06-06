@@ -13,7 +13,10 @@ public:
     static Engine* getInstance();
 
     void init();
-    void initDisplay();
+
+    void initRendering();
+
+    bool isDrawing();
 
     void run(android_app* app);
     void handleCmd(android_app* app, int32_t cmd);
@@ -42,9 +45,10 @@ public:
 private:
     inline static Engine* mInstance = nullptr;
     android_app* mApp;
-    EGLContext mContext;
+    EGLContext mContext = EGL_NO_CONTEXT;
     EGLDisplay mDisplay = EGL_NO_DISPLAY;
     EGLSurface mSurface = EGL_NO_SURFACE;
+    EGLConfig mConfig = nullptr;
     EGLint mNumConfigs = 0;
     EGLint mFormat = 0;
     Shader mShader;
@@ -56,4 +60,7 @@ private:
     float mTouchPosX = 0.0f;
     float mTouchPosY = 0.0f;
     std::vector<GameObject*> mGameObjects;
+    bool mIsWindowInited = false;
+    bool mIsFirstFrame = true;
+    bool mIsVisible = false;
 };
