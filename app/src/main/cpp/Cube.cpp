@@ -2,13 +2,10 @@
 #include "Engine.h"
 
 void Cube::draw(Shader shader) {
-    mCubeMesh.draw(shader);
+    mCubeMesh.draw(shader, getPosition(), getRotation(), glm::vec3(1.0f));
 }
 
 void Cube::update() {
-    mCubeMesh.setPosition(getPosition());
-    mCubeMesh.setRotation(getRotation());
-
     if(Engine::getInstance()->isDownAction()) {
         mCurrX = Engine::getInstance()->getToucPosX();
         mCurrY = Engine::getInstance()->getToucPosY();
@@ -17,7 +14,7 @@ void Cube::update() {
     }
 
     if(Engine::getInstance()->isMoveAction()) {
-        float radius = 3.0f;
+        float radius = 1.0f;
         mCubeRotationX = mPreviousCubeRotationX + (mCurrX - Engine::getInstance()->getToucPosX()) / Engine::getInstance()->getWidth();
         mCubeRotationY = mPreviousCubeRotationY + (mCurrY - Engine::getInstance()->getToucPosY()) / Engine::getInstance()->getHeight();
         setPosition(glm::vec3(sinf(mCubeRotationY * 2*PI) * radius, 0.0f, cosf(mCubeRotationY* 2*PI) * radius));

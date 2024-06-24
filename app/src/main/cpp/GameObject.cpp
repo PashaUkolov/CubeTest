@@ -8,21 +8,13 @@ void TransformComponent::setRotation(glm::vec3 rotation) {
     mRotation = rotation;
 }
 
-void TransformComponent::setWidth(float newWidth) {
-    mWidth = newWidth;
-}
-
-void TransformComponent::setHeight(float newHeight) {
-    mHeight = newHeight;
-}
-
-void TransformComponent::setDepth(float newDepth) {
-    mDepth = newDepth;
-}
-
-void TransformComponent::setScale(float scale) {
+void TransformComponent::setScale(glm::vec3 scale) {
     mScale = scale;
 }
 
 GameObject::~GameObject() {
+}
+
+void GameObject::addChild(GameObject *child) {
+    mChildren.push_back(child);
 }

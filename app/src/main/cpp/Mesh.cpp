@@ -61,27 +61,20 @@ Mesh::Mesh() {
     glEnableVertexAttribArray(1);
 }
 
-void Mesh::draw(const Shader& shader) {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, mPosition);
-    model = glm::rotate(model, mRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, mRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, mRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+void Mesh::draw(const Shader& shader, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) {
+    mTransform = glm::mat4(1.0f);
+    mTransform = glm::translate(mTransform, position);
+    mTransform = glm::rotate(mTransform, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    mTransform = glm::rotate(mTransform, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    mTransform = glm::rotate(mTransform, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    mTransform = glm::scale(mTransform, scale);
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::lookAt(glm::vec3(0.0f, 8.0f, -8.0f ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(Engine::getInstance()->getWidth()) / static_cast<float>(Engine::getInstance()->getHeight()), 0.1f, 1000.0f);
 
-    glUniformMatrix4fv(glGetUniformLocation(shader.mId, "model"), 1, false, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(shader.mId, "model"), 1, false, glm::value_ptr(mTransform));
     glUniformMatrix4fv(glGetUniformLocation(shader.mId, "view"), 1, false, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(shader.mId, "projection"), 1, false, glm::value_ptr(projection));
 
     glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
-}
-
-void Mesh::setPosition(glm::vec3 position) {
-    mPosition = position;
-}
-
-void Mesh::setRotation(glm::vec3 rotation) {
-    mRotation = rotation;
 }

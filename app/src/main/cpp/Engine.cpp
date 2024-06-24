@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Cube.h"
+#include "CubeArray.h"
 
 Engine::Engine() {
 }
@@ -29,8 +30,14 @@ Engine* Engine::getInstance() {
 }
 
 void Engine::init() {
-    Cube *cube = new Cube();
-    mGameObjects.push_back(cube);
+    //Cube *cube = new Cube();
+    //mGameObjects.push_back(cube);
+    CubeArray* cubeArray = new CubeArray();
+    cubeArray->init();
+    for(auto& object : cubeArray->mChildren) {
+        mGameObjects.push_back(object);
+    }
+
     mShader = Shader("shaders/default");
 }
 

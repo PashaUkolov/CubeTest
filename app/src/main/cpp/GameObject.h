@@ -6,30 +6,38 @@ class TransformComponent {
 public:
     void setPosition(glm::vec3 position);
     void setRotation(glm::vec3 rotation);
-    void setWidth(float newWidth);
-    void setHeight(float newHeight);
-    void setDepth(float newDepth);
-    void setScale(float scale);
+    void setScale(glm::vec3 scale);
     glm::vec3 getPosition() { return mPosition; };
     glm::vec3 getRotation() { return mRotation; };
-    float getWidth() { return mWidth; };
-    float getHeight() { return mHeight; };
-    float getDepth() { return mDepth; };
-    float getScale() { return mScale; };
-private:
-    glm::vec3 mPosition;
+    glm::vec3 getScale() { return mScale; };
+    glm::mat4 getTransform() { return mTransform; };
+    glm::vec3 mPosition {0.0f};
     glm::vec3 mRotation;
-    float mWidth = 0.0f;
-    float mHeight = 0.0f;
-    float mDepth = 0.0f;
-    float mScale = 1.0f;
+    glm::vec3 mScale {1.0f};
+    glm::mat4 mTransform { 1.0f };
+private:
 };
 
-class GameObject : public TransformComponent {
+template <typename Child>
+class TransformComponentProxy : public TransformComponent {
+    void updateChildTransform() {
+        Child* c = dynamic_cast<Child*>(this);
+        for(const auto& child : c->mChildren) {
+            auto transform = getTransform();
+            child.mTransform *= transform;
+        }
+    }
+};
+
+class GameObject : public TransformComponentProxy<GameObject> {
 public:
     GameObject() {};
     virtual ~GameObject();
 
     virtual void draw(Shader shader) {};
     virtual void update() {};
+
+    void addChild(GameObject* child);
+
+    std::vector<GameObject*> mChildren;
 };
