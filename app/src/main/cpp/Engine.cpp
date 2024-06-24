@@ -31,12 +31,16 @@ Engine* Engine::getInstance() {
 
 void Engine::init() {
     //Cube *cube = new Cube();
+    //cube->init();
     //mGameObjects.push_back(cube);
-    CubeArray* cubeArray = new CubeArray();
-    cubeArray->init();
-    for(auto& object : cubeArray->mChildren) {
-        mGameObjects.push_back(object);
-    }
+//    CubeArray *cubeArray = new CubeArray();
+//    cubeArray->init();
+
+CubeArray c;
+c.init();
+//    for(auto& object : cubeArray->mChildren) {
+//        mGameObjects.push_back(object);
+//    }
 
     mShader = Shader("shaders/default");
 }

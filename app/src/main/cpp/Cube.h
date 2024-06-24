@@ -4,6 +4,7 @@
 
 class Cube : public GameObject {
 public:
+    void init();
     void draw(Shader shader) override;
     void update() override;
     virtual ~Cube() {};

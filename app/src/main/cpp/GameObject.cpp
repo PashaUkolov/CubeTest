@@ -12,6 +12,8 @@ void TransformComponent::setScale(glm::vec3 scale) {
     mScale = scale;
 }
 
+GameObject::GameObject() {
+}
 GameObject::~GameObject() {
 }
 

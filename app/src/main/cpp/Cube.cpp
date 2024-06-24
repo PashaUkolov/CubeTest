@@ -26,3 +26,7 @@ void Cube::update() {
         mPreviousCubeRotationY = mCubeRotationY;
     }
 }
+
+void Cube::init() {
+    LOGE("STUFF IS INITED");
+}

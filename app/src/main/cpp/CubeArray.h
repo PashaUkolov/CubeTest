@@ -1,9 +1,12 @@
 #pragma once
-#include "GameObject.h"
+//#include "GameObject.h"
+#include "Shader.h"
 
-class CubeArray : public GameObject {
+class CubeArray {
 public:
-    CubeArray() = default;
     void init();
+    void draw(Shader shader);
+    void update();
+
 private:
 };

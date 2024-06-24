@@ -31,7 +31,7 @@ class TransformComponentProxy : public TransformComponent {
 
 class GameObject : public TransformComponentProxy<GameObject> {
 public:
-    GameObject() {};
+    GameObject();
     virtual ~GameObject();
 
     virtual void draw(Shader shader) {};
