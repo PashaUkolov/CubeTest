@@ -10,7 +10,6 @@ public:
     virtual ~Cube() {};
 private:
     Mesh mCubeMesh;
-
     float mCubeRotationX = 0.0f;
     float mCubeRotationY = 0.0f;
     float mPreviousCubeRotationX = 0.0f;

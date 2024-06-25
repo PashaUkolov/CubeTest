@@ -2,6 +2,7 @@
 #include "common.h"
 #include "Shader.h"
 #include "GameObject.h"
+#include "CubeArray.h"
 
 #include <android_native_app_glue.h>
 
@@ -60,6 +61,8 @@ private:
     float mTouchPosX = 0.0f;
     float mTouchPosY = 0.0f;
     std::vector<GameObject*> mGameObjects;
+    std::vector<CubeArray*> cubeArrays;
+    //CubeArray *cubeArray = nullptr;
     bool mIsWindowInited = false;
     bool mIsFirstFrame = true;
     bool mIsVisible = false;

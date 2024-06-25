@@ -8,6 +8,7 @@ class Mesh {
 public:
     Mesh();
     void draw(const Shader& shader, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+    void draw(const Shader& shader, glm::mat4 transform);
 private:
     std::vector<glm::vec3> mVertices;
     std::vector<glm::vec3> mNormals;
@@ -18,7 +19,7 @@ private:
     glm::vec3 mPosition{0.0f};
     glm::vec3 mRotation{0.0f};
     glm::vec3 mScale{1.0f};
-    glm::mat4 mTransform{1.0f};
+    //glm::mat4 mTransform{1.0f};
 
     float mCubeRotationX = 0.0f;
     float mCubeRotationY = 0.0f;

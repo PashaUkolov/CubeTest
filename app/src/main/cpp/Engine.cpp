@@ -9,7 +9,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Cube.h"
 #include "CubeArray.h"
 
 Engine::Engine() {
@@ -30,17 +29,12 @@ Engine* Engine::getInstance() {
 }
 
 void Engine::init() {
-    //Cube *cube = new Cube();
-    //cube->init();
-    //mGameObjects.push_back(cube);
-//    CubeArray *cubeArray = new CubeArray();
-//    cubeArray->init();
-
-CubeArray c;
-c.init();
-//    for(auto& object : cubeArray->mChildren) {
-//        mGameObjects.push_back(object);
-//    }
+    for(int i = 0; i < 4; i++) {
+        CubeArray* cubeArray = new CubeArray();
+        cubeArray->init();
+        cubeArray->setPosition({0.0f, (float)i, 0.0f});
+        cubeArrays.push_back(cubeArray);
+    }
 
     mShader = Shader("shaders/default");
 }
@@ -142,9 +136,11 @@ void Engine::run(android_app* app) {
 
             glUseProgram(mShader.mId);
 
-            for(const auto& object : mGameObjects) {
-                object->draw(mShader);
-                object->update();
+            for(auto& cubeArray : cubeArrays) {
+                cubeArray->updateChilds();
+                cubeArray->update();
+                cubeArray->drawChilds(mShader);
+                cubeArray->draw(mShader);
             }
         }
 
