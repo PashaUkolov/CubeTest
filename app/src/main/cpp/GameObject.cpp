@@ -58,9 +58,9 @@ glm::mat4 computeTrsMatrix(const glm::vec3& translation, const glm::quat& rotati
 
 void GameObject::updateChildTransform() {
     mLocalTransform = computeTrsMatrix(mPosition, mRotation, mScale);
-    if (!parent) {
+    //if (!parent) {
         mGlobalTransform = mLocalTransform;
-    }
+    //}
 
     for(auto& child : mChildren) {
         child->mGlobalTransform = mGlobalTransform * child->mLocalTransform;

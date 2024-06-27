@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "GameObject.h"
 #include "CubeArray.h"
+#include "Camera.h"
 
 #include <android_native_app_glue.h>
 
@@ -36,6 +37,9 @@ public:
     float getToucPosX() { return mTouchPosX; }
     float getToucPosY() { return mTouchPosY; }
 
+    glm::vec3 calculateMouseRay();
+    void updateCubesControll();
+
     void addGameObject(GameObject* object);
 
     JNIEnv* attachCurrentThread();
@@ -61,9 +65,11 @@ private:
     float mTouchPosX = 0.0f;
     float mTouchPosY = 0.0f;
     std::vector<GameObject*> mGameObjects;
-    std::vector<CubeArray*> cubeArrays;
+    //std::vector<CubeArray*> cubeArrays;
     //CubeArray *cubeArray = nullptr;
+    std::vector<CubeArray*> mCubes;
     bool mIsWindowInited = false;
     bool mIsFirstFrame = true;
     bool mIsVisible = false;
+    Camera* mCamera = nullptr;
 };
